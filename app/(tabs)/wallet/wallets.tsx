@@ -13,6 +13,7 @@ import { GestureHandlerRootView, Swipeable } from 'react-native-gesture-handler'
 import { useFocusEffect } from 'expo-router';
 import Icon from 'react-native-vector-icons/FontAwesome'
 import { SocialIcon } from 'react-native-elements';
+import NFCHandler from './NFCHandler';
 
 interface CardData {
   id: string;
@@ -58,6 +59,8 @@ const DisplayCardsScreen: React.FC = () => {
   const navigation = useNavigation();
   const { isDarkMode, toggleDarkMode } = useDarkMode();
   const { colors } = useColors();
+  const [nfcVisible, setNfcVisible] = useState(false);
+
 
   const handleAddCardPress = () =>{
     // @ts-ignore
@@ -78,6 +81,14 @@ const DisplayCardsScreen: React.FC = () => {
     setSelectedCard(card);
     setDetailsModalVisible(true);
   }
+
+  const handleNfcClose = () => {
+    setNfcVisible(false);
+  };
+
+  const handleCardSelected = (card: CardData) => {
+    Alert.alert('Card Shared', `You have shared ${card.firstName} ${card.lastName}'s card.`);
+  };
 
   const fetchCards = async() => {
     const user = auth.currentUser;
@@ -322,6 +333,14 @@ const DisplayCardsScreen: React.FC = () => {
         <Text style={[styles.headerTitle, { color: isDarkMode ? '#fff' : '#000' }]}>Wallet</Text>
       </View>
       
+          {/* Add an NFC exchange button */}
+          <TouchableOpacity style={styles.nfcButton} onPress={() => setNfcVisible(true)}>
+          <Text style={styles.nfcButtonText}>Tap to Exchange via NFC</Text>
+        </TouchableOpacity>
+        
+        {/* Include the NFCHandler component */}
+        <NFCHandler visible={nfcVisible} onClose={handleNfcClose} onCardSelected={handleCardSelected} />
+
       <View style={styles.searchContainer}>
         <View style={[styles.searchBar, isDarkMode && styles.darkSearchBar]}>
           <Ionicons name="search" size={20} color={isDarkMode ? "lightgray" : "gray"} style={styles.searchIcon} />
@@ -510,6 +529,8 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
     paddingTop: 50,
   },
   header:{
@@ -691,6 +712,10 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     marginTop: 50,
   },
+  title: {
+    fontSize: 24,
+    marginBottom: 20,
+  },
   detailText:{
     fontSize: 16,
     marginBottom: 14,
@@ -710,6 +735,15 @@ const styles = StyleSheet.create({
   closeButtonText:{
     color: '#fff',
     fontWeight: 'bold',
+  },
+  nfcButton: {
+    backgroundColor: '#007bff',
+    padding: 15,
+    borderRadius: 10,
+  },
+  nfcButtonText: {
+    color: 'white',
+    fontSize: 18,
   },
 });
 

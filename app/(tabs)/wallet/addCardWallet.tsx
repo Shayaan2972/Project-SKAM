@@ -13,16 +13,22 @@ import  MaskInput, {createNumberMask} from 'react-native-mask-input';
 import { useDarkMode } from '@/app/DarkModeContext';
 import Icon from 'react-native-vector-icons/FontAwesome'
 import { SocialIcon } from 'react-native-elements';
+import NFCHandler from './NFCHandler';
 
 interface CardData {
   //id: string;
   firstName: string;
   lastName: string;
-  born: number;
+  born?: number;
   type: 'Student' | 'Work' | 'Personal';
   phone: string;
   workNumber?: string;
 }
+type RootStackParamList = {
+  Wallet: undefined;
+  AddCard: undefined;
+  NFCExchange: undefined;  // Ensure NFCExchange is added to your type
+};
 
 const AddCardScreen: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -34,6 +40,7 @@ const AddCardScreen: React.FC = () => {
   const navigation = useNavigation();
   const { colors } = useColors();
   const [phoneNumber, setPhoneNumber] = useState('');
+  const [nfcVisible, setNfcVisible] = useState(false);
 
 
   useFocusEffect(() => {
@@ -44,6 +51,18 @@ navigation.setOptions({
    } as StackNavigationOptions);
   });
 
+  const handleNfcClose = () => {
+    setNfcVisible(false);
+  };
+
+  const handleCardSelected = (card: CardData) => {
+    Alert.alert('Card Shared', `You have shared ${card.firstName} ${card.lastName}'s card.`);
+  };
+
+  const goToNFCExchange = () => {
+    setNfcVisible(true);
+  };
+
   const handlePhoneNumber = (formatted: string, extracted: string) => {
     setPhoneNumber(extracted);
   };
@@ -53,7 +72,7 @@ navigation.setOptions({
       Alert.alert('Error', 'Please enter a phone number or work number');
       return;
     }
-
+  
     setIsLoading(true);
     try{
     const q = query(
@@ -235,6 +254,13 @@ navigation.setOptions({
 
   return (
     <View style={styles.container}>
+     <TouchableOpacity style={styles.nfcButton} onPress={goToNFCExchange}>
+        <Text style={styles.buttonText}>Exchange Card via NFC</Text>
+      </TouchableOpacity>
+      
+         {/* Include the NFCHandler component */}
+         <NFCHandler visible={nfcVisible} onClose={handleNfcClose} onCardSelected={handleCardSelected} />
+
       <MaskInput
         style={[styles.searchInput, 
           { color: isDarkMode ? '#fff' : '#000',
@@ -362,6 +388,23 @@ const styles = StyleSheet.create({
   },
   detailsContainer:{
     marginTop: 15,
+  },
+  orText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginVertical: 10,
+  },
+  nfcButton: {
+    backgroundColor: '#4CAF50',
+    padding: 15,
+    borderRadius: 10,
+    marginVertical: 20,
+    alignItems: 'center',
+  },
+  nfcButtonText: {
+    color: 'white',
+    fontSize: 18,
   },
 });
 

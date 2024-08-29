@@ -13,13 +13,15 @@
       "backgroundColor": "#000000"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "IOS.SKAM"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/skamLogo.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "android.SKAM"
     },
     "web": {
       "bundler": "metro",
